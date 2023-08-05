@@ -1,19 +1,60 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Scrapper rekvizitai.vz.lt{% endblock %}
+{% block stylesheets %}
+    <link href="{{ asset('bootstrap/css/bootstrap.min.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('datatables/datatables.min.css') }}" rel="stylesheet"/>
+    <style>
+        th {
+            overflow: auto;
+            white-space: nowrap;
+        }
+    </style>
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('jquery/jquery-3.7.0.min.js') }}"></script>
+    <script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('datatables/datatables.min.js') }}"></script>
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <style>
+        .example-wrapper {
+            margin: 1em auto;
+            max-width: 800px;
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
 
-<div class="example-wrapper">
-    <div>
-        <input type="text" name="search">
-        <button type="button" name="search-button">search</button>
+        .example-wrapper code {
+            background: #F5F5F5;
+            padding: 2px 6px;
+        }
+    </style>
+
+    <div class="example-wrapper">
+        <table id="results-table">
+        </table>
     </div>
-    <div>
-    </div>
-</div>
+    <script type="text/javascript">
+        let table = $('#results-table').DataTable({
+            ajax: '/get_rows',
+            columns: [
+                {title: 'Company Name', data: 'name', searchable: false, type: 'string'},
+                {title: 'Registration Code', data: 'reg', searchable: true, type: 'num'},
+                {title: 'VAT', data: 'vat', searchable: false, type: 'string'},
+                {title: 'Address', data: 'address', searchable: false, type: 'string'},
+                {title: 'Mobile Number', data: 'mobile', searchable: false, type: 'string'},
+                {title: 'Turnover', data: 'turnover', searchable: false, type: 'string'}
+            ],
+            columnDefs: [
+                {target: '_all', className: 'oneline'}
+            ],
+            processing: true,
+            search: {
+                return: true,
+            },
+            serverSide: true,
+        });
+    </script>
 {% endblock %}

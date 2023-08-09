@@ -37,8 +37,15 @@
         </table>
     </div>
     <script type="text/javascript">
+        String.prototype.isNumeric = function() {
+            return /^\d+$/.test(this);
+        }
+
         let table = $('#results-table').DataTable({
-            ajax: '/get_rows',
+            ajax: {
+                url: "{{ get_env('ENDPOINT_GETROWS') }}",
+                contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
+            },
             columns: [
                 {title: 'Company Name', data: 'name', searchable: false, type: 'string'},
                 {title: 'Registration Code', data: 'reg', searchable: true, type: 'num'},
@@ -55,6 +62,32 @@
                 return: true,
             },
             serverSide: true,
+        }).on('preXhr.dt', (e, settings, data) => {
+            //console.log(data);
+            //const ids = data.search.value.split(',');
+        }).on('draw.dt', (e, settings) => {
+            //const table = $('#results-table').DataTable();
+            const rowsCount = settings.json.data.length;
+            const search = settings.oPreviousSearch.sSearch;
+            if (rowsCount || !search) return;
+
+            // now its only when searched and no results returned
+            if (search.length != 8 || !search.isNumeric()) { // validate search term
+                const lengthError = search.length == 8 ? '' : 'search term must be of 8 characters';
+                const typeError = search.isNumeric() ? '' : 'search term must be all numeric';
+                console.log(`CrawlError: ${lengthError} ${typeError}`);
+            } else {
+                console.log(`time to crawl with ${search}`);
+                $.ajax({
+                    url: "{{ get_env('ENDPOINT_CRAWLER') }}",
+                    data: {search},
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: (data) => {
+
+                    }
+                });
+            }
         });
     </script>
 {% endblock %}

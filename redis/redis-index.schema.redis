@@ -1,0 +1,1 @@
+FT.CREATE idx:companies ON HASH PREFIX 1 company: SCHEMA name TEXT reg TEXT vat TEXT address TEXT mobile TEXT

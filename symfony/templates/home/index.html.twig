@@ -41,8 +41,6 @@
             return /^\d+$/.test(this);
         }
         String.prototype.trim_chars = function(charset, opts) {
-            //const { left, right } = options_object({left: undefined, right: undefined}, opts);
-            //opts = opts? opts:{left: true, right: true};
             const { left, right } = opts;
             charset = charset || '';
             const pattern = `[\\s${charset}]+`;
@@ -73,9 +71,6 @@
                 return: true,
             },
             serverSide: true,
-        }).on('preXhr.dt', (e, settings, data) => {
-            //console.log(data);
-            //const ids = data.search.value.split(',');
         }).on('draw.dt', (e, settings) => {
             //const table = $('#results-table').DataTable();
             const rowsCount = settings.json.data.length;
@@ -92,8 +87,9 @@
                 console.log(`time to crawl with ${search}`);
                 $.ajax({
                     url: "{{ get_env('ENDPOINT_SCRAPER') }}",
+                    method: 'POST',
                     data: {search},
-                    contentType: 'application/json',
+                    //contentType: 'application/json',
                     dataType: 'json',
                     success: (data) => {
 

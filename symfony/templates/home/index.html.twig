@@ -40,6 +40,17 @@
         String.prototype.isNumeric = function() {
             return /^\d+$/.test(this);
         }
+        String.prototype.trim_chars = function(charset, opts) {
+            //const { left, right } = options_object({left: undefined, right: undefined}, opts);
+            //opts = opts? opts:{left: true, right: true};
+            const { left, right } = opts;
+            charset = charset || '';
+            const pattern = `[\\s${charset}]+`;
+            let regex = new RegExp(`^${pattern}|${pattern}$`, 'g');
+            if (left) regex = new RegExp(`^${pattern}`);
+            if (right) regex = new RegExp(`${pattern}$`);
+            return this.replace(new RegExp(regex), '');
+        };
 
         let table = $('#results-table').DataTable({
             ajax: {
@@ -69,17 +80,18 @@
             //const table = $('#results-table').DataTable();
             const rowsCount = settings.json.data.length;
             const search = settings.oPreviousSearch.sSearch;
-            if (rowsCount || !search) return;
+            if (rowsCount || !search) return; // table not empty or not performed search
 
             // now its only when searched and no results returned
-            if (search.length != 8 || !search.isNumeric()) { // validate search term
-                const lengthError = search.length == 8 ? '' : 'search term must be of 8 characters';
-                const typeError = search.isNumeric() ? '' : 'search term must be all numeric';
-                console.log(`CrawlError: ${lengthError} ${typeError}`);
+            //search = search.trim_chars(',');
+            if (!/^\d{8}(,\d{8})*$/.test(search)) { // validate search term
+                //const lengthError = search.length == 8 ? '' : 'each search term must be of 8 characters';
+                //const typeError = search.isNumeric() ? '' : 'each search term must be all numeric';
+                console.log(`CrawlError: scraper search terms must be of 8 characters and all numeric`);
             } else {
                 console.log(`time to crawl with ${search}`);
                 $.ajax({
-                    url: "{{ get_env('ENDPOINT_CRAWLER') }}",
+                    url: "{{ get_env('ENDPOINT_SCRAPER') }}",
                     data: {search},
                     contentType: 'application/json',
                     dataType: 'json',
